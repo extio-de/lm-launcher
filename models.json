@@ -1,0 +1,1 @@
+{"models":[{"path":"/home/sb/lm/models/Meta-Llama-3.1-8B-Instruct-Q8_0.gguf","contextSize":32768,"maxContextSize":32768,"gpuLayers":99,"threads":6,"promptTemplate":"llama-3"}]}
