@@ -92,7 +92,7 @@ public class ModelPropertiesDialog extends JDialog {
 		}
 		{
 			this.textField_2 = new JTextField();
-			this.textField_2.setText("8");
+			this.textField_2.setText("6");
 			this.contentPanel.add(this.textField_2);
 			this.textField_2.setColumns(10);
 		}

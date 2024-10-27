@@ -302,7 +302,7 @@ public class LaunchFrame extends JFrame {
 								
 								this.slider_context.setMaximum(model.maxContextSize());
 								this.slider_context.setMajorTickSpacing(model.maxContextSize() / 4);
-								this.slider_context.setMinorTickSpacing(model.maxContextSize() / 8);
+								this.slider_context.setMinorTickSpacing(model.maxContextSize() / 16);
 								this.slider_context.setValue(model.contextSize());
 								this.slider_context.setLabelTable(this.slider_context.createStandardLabels(model.maxContextSize() / 4));
 								this.slider_context.setSnapToTicks(true);

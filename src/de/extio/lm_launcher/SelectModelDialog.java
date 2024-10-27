@@ -95,7 +95,10 @@ public class SelectModelDialog extends JDialog {
 	}
 	
 	private void initialize() {
-		Data.scanModels().forEach(this.listModel::addElement);
+		Data.scanModels()
+			.stream()
+			.filter(p -> Data.modelData.models().stream().noneMatch(m -> m.path().equals(p)))
+			.forEach(this.listModel::addElement);
 	}
 	
 }
