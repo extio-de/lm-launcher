@@ -124,7 +124,6 @@ public class LaunchFrame extends JFrame {
 	public LaunchFrame() {
 		this.setTitle("LM Launcher");
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		this.setBounds(100, 100, 400, 400);
 		this.setPreferredSize(new Dimension(650, 650));
 		this.contentPane = new JPanel();
 		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -539,6 +538,7 @@ public class LaunchFrame extends JFrame {
 		}
 		
 		this.pack();
+		this.setLocationRelativeTo(null);
 		this.repaint();
 		this.splitPane.setDividerLocation(0.33);
 		this.splitPane_1.setDividerLocation(0.66);
