@@ -7,6 +7,8 @@ public class Main {
 	public static void main(final String[] args) {
 		System.setProperty("awt.useSystemAAFontSettings", "on");
 		System.setProperty("swing.aatext", "true");
+		System.setProperty("sun.java2d.uiScale", "1");
+		System.setProperty("awt.nativeDoubleBuffering", "true");
 		
 		EventQueue.invokeLater(new Runnable() {
 			

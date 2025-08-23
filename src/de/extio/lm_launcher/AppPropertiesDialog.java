@@ -58,9 +58,9 @@ public class AppPropertiesDialog extends JDialog {
 		AppPropertiesDialog.app = app;
 		this.onClose = onClose;
 		
-		this.setBounds(100, 100, 681, 350);
+		this.setBounds(UIScaler.scale(100), UIScaler.scale(100), UIScaler.scale(681), UIScaler.scale(350));
 		this.getContentPane().setLayout(new BorderLayout());
-		this.contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		this.contentPanel.setBorder(new EmptyBorder(UIScaler.scale(5), UIScaler.scale(5), UIScaler.scale(5), UIScaler.scale(5)));
 		this.getContentPane().add(this.contentPanel, BorderLayout.CENTER);
 		this.contentPanel.setLayout(new BorderLayout(0, 0));
 		{
@@ -75,6 +75,8 @@ public class AppPropertiesDialog extends JDialog {
 				this.table.setRowSelectionAllowed(false);
 				this.table.setFillsViewportHeight(true);
 				this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+				// Scale the table row height to accommodate larger checkboxes
+				this.table.setRowHeight(UIScaler.scale(this.table.getRowHeight()));
 				
 				JCheckBoxRenderer renderer = new JCheckBoxRenderer();
 				JCheckBoxEditor editor = new JCheckBoxEditor();
@@ -137,6 +139,9 @@ public class AppPropertiesDialog extends JDialog {
 		this.textField.setText(app.argumentsToString(true));
 		
 		this.refreshTable();
+		
+		// Apply font scaling to all components
+		UIScaler.scaleComponentFonts(this);
 	}
 	
 	private void refreshTable() {
@@ -173,6 +178,11 @@ public class AppPropertiesDialog extends JDialog {
 	
 	static class JCheckBoxRenderer extends JCheckBox implements TableCellRenderer {
 		
+		public JCheckBoxRenderer() {
+			// Apply comprehensive checkbox scaling
+			UIScaler.scaleCheckBox(this);
+		}
+		
 		@Override
 		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 			this.setSelected((boolean) value);
@@ -185,6 +195,9 @@ public class AppPropertiesDialog extends JDialog {
 		private final JCheckBox checkBox = new JCheckBox() {
 			
 			{
+				// Apply comprehensive checkbox scaling
+				UIScaler.scaleCheckBox(this);
+				
 				this.addActionListener(e -> {
 					final AppArgument existing = AppPropertiesDialog.app.appArguments().get(JCheckBoxEditor.this.row);
 					if (JCheckBoxEditor.this.column == 1) {

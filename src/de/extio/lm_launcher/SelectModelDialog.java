@@ -40,9 +40,9 @@ public class SelectModelDialog extends JDialog {
 		this.setModal(true);
 		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		
-		this.setBounds(100, 100, 578, 251);
+		this.setBounds(UIScaler.scale(100), UIScaler.scale(100), UIScaler.scale(578), UIScaler.scale(251));
 		this.getContentPane().setLayout(new BorderLayout());
-		this.contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		this.contentPanel.setBorder(new EmptyBorder(UIScaler.scale(5), UIScaler.scale(5), UIScaler.scale(5), UIScaler.scale(5)));
 		this.getContentPane().add(this.contentPanel, BorderLayout.CENTER);
 		this.contentPanel.setLayout(new BorderLayout(0, 0));
 		{
@@ -92,6 +92,9 @@ public class SelectModelDialog extends JDialog {
 			}
 		}
 		this.initialize();
+		
+		// Apply font scaling to all components
+		UIScaler.scaleComponentFonts(this);
 	}
 	
 	private void initialize() {

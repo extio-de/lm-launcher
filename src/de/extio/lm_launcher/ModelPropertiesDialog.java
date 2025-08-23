@@ -53,9 +53,9 @@ public class ModelPropertiesDialog extends JDialog {
 		this.setModal(true);
 		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		
-		this.setBounds(100, 100, 678, 191);
+		this.setBounds(UIScaler.scale(100), UIScaler.scale(100), UIScaler.scale(678), UIScaler.scale(191));
 		this.getContentPane().setLayout(new BorderLayout());
-		this.contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		this.contentPanel.setBorder(new EmptyBorder(UIScaler.scale(5), UIScaler.scale(5), UIScaler.scale(5), UIScaler.scale(5)));
 		this.getContentPane().add(this.contentPanel, BorderLayout.CENTER);
 		this.contentPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		{
@@ -150,6 +150,9 @@ public class ModelPropertiesDialog extends JDialog {
 			this.textField_3.setText(String.valueOf(editModel.contextSize()));
 			this.txtPrompttemplate.setText(editModel.promptTemplate());
 		}
+		
+		// Apply font scaling to all components
+		UIScaler.scaleComponentFonts(this);
 	}
 	
 }

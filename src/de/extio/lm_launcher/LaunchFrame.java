@@ -124,9 +124,9 @@ public class LaunchFrame extends JFrame {
 	public LaunchFrame() {
 		this.setTitle("LM Launcher");
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		this.setPreferredSize(new Dimension(650, 650));
+		this.setPreferredSize(UIScaler.scale(new Dimension(650, 650)));
 		this.contentPane = new JPanel();
-		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		this.contentPane.setBorder(new EmptyBorder(UIScaler.scale(5), UIScaler.scale(5), UIScaler.scale(5), UIScaler.scale(5)));
 		
 		this.setContentPane(this.contentPane);
 		this.contentPane.setLayout(new BorderLayout(0, 0));
@@ -276,6 +276,8 @@ public class LaunchFrame extends JFrame {
 							this.table = new JTable(this.appArgumentsTableModel);
 							this.table.setRowSelectionAllowed(false);
 							this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+							// Scale the table row height to accommodate larger checkboxes
+							this.table.setRowHeight(UIScaler.scale(this.table.getRowHeight()));
 							this.table.getColumnModel().getColumn(0).setCellRenderer(new AppArgumentsJCheckBoxRenderer(this.appArgumentsTableModel));
 							this.table.getColumnModel().getColumn(0).setCellEditor(new AppArgumentsJCheckBoxEditor());
 							
@@ -538,7 +540,11 @@ public class LaunchFrame extends JFrame {
 		}
 		
 		this.pack();
-		this.setLocationRelativeTo(null);
+		
+		// Apply font scaling to all components
+		UIScaler.scaleComponentFonts(this);
+		
+		UIScaler.centerOnPrimaryDisplay(this);
 		this.repaint();
 		this.splitPane.setDividerLocation(0.33);
 		this.splitPane_1.setDividerLocation(0.66);
@@ -575,6 +581,8 @@ public class LaunchFrame extends JFrame {
 		public AppArgumentsJCheckBoxRenderer(final DefaultTableModel model) {
 			super();
 			this.model = model;
+			// Apply comprehensive checkbox scaling
+			UIScaler.scaleCheckBox(this);
 		}
 		
 		@Override
@@ -591,6 +599,11 @@ public class LaunchFrame extends JFrame {
 		private final JCheckBox checkBox = new JCheckBox();
 		
 		private AppArgument appArgument;
+		
+		public AppArgumentsJCheckBoxEditor() {
+			// Apply comprehensive checkbox scaling
+			UIScaler.scaleCheckBox(this.checkBox);
+		}
 		
 		@Override
 		public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
