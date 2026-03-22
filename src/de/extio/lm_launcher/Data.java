@@ -91,13 +91,15 @@ public class Data {
 	static List<String> scanModels() {
 		final List<String> result = new ArrayList<>();
 		try {
-			Files
-					.list(Path.of(props.getProperty("models")))
-					.filter(p -> p.getFileName().toString().endsWith(".gguf"))
-					.map(Path::toAbsolutePath)
-					.map(Path::toString)
-					.sorted()
-					.forEach(result::add);
+			try (var paths = Files.walk(Path.of(props.getProperty("models")))) {
+				paths
+						.filter(Files::isRegularFile)
+						.filter(p -> p.getFileName().toString().endsWith(".gguf"))
+						.map(Path::toAbsolutePath)
+						.map(Path::toString)
+						.sorted()
+						.forEach(result::add);
+			}
 		}
 		catch (final IOException e) {
 			e.printStackTrace();

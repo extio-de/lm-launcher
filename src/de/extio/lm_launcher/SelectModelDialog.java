@@ -5,6 +5,9 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import javax.swing.DefaultListModel;
@@ -29,6 +32,8 @@ public class SelectModelDialog extends JDialog {
 	JList list;
 	
 	DefaultListModel<String> listModel;
+	
+	List<String> modelPaths;
 	
 	/**
 	 * Create the dialog.
@@ -70,7 +75,7 @@ public class SelectModelDialog extends JDialog {
 							return;
 						}
 						SelectModelDialog.this.setVisible(false);
-						modelPathConsumer.accept(SelectModelDialog.this.listModel.getElementAt(SelectModelDialog.this.list.getSelectedIndex()));
+						modelPathConsumer.accept(SelectModelDialog.this.modelPaths.get(SelectModelDialog.this.list.getSelectedIndex()));
 						SelectModelDialog.this.dispose();
 					}
 				});
@@ -98,10 +103,19 @@ public class SelectModelDialog extends JDialog {
 	}
 	
 	private void initialize() {
+		final Path modelsRoot = Path.of(Data.props.getProperty("models")).toAbsolutePath().normalize();
+		this.modelPaths = new ArrayList<>();
 		Data.scanModels()
 			.stream()
 			.filter(p -> Data.modelData.models().stream().noneMatch(m -> m.path().equals(p)))
-			.forEach(this.listModel::addElement);
+			.forEach(absolutePath -> {
+				final Path modelPath = Path.of(absolutePath).toAbsolutePath().normalize();
+				final String displayPath = modelPath.startsWith(modelsRoot)
+						? modelsRoot.relativize(modelPath).toString()
+						: modelPath.toString();
+				this.modelPaths.add(modelPath.toString());
+				this.listModel.addElement(displayPath.isEmpty() ? modelPath.getFileName().toString() : displayPath);
+			});
 	}
 	
 }
