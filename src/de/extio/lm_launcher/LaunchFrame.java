@@ -142,9 +142,6 @@ public class LaunchFrame extends JFrame {
 						final SelectModelDialog smDialog = new SelectModelDialog(LaunchFrame.this, path -> {
 							final ModelPropertiesDialog mpDialog = new ModelPropertiesDialog(LaunchFrame.this, path, null, model -> {
 								Data.modelData.models().add(model);
-								Data.modelData.models().sort((o1, o2) -> {
-									return o1.path().compareTo(o2.path());
-								});
 								try {
 									Data.saveModels();
 								}
@@ -554,6 +551,7 @@ public class LaunchFrame extends JFrame {
 	}
 	
 	private void refresh() {
+		Data.sortModels();
 		this.listModel.clear();
 		Data.appData.apps()
 				.stream()

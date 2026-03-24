@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
@@ -47,6 +48,7 @@ public class Data {
 				modelData.models.set(i, new Model(model.path(), model.contextSize(), model.contextSize(), model.gpuLayers(), model.threads(), Objects.requireNonNullElse(model.promptTemplate(), "")));
 			}
 		}
+		sortModels();
 		
 		try {
 			appData = objectMapper.readValue(new File("apps.json"), AppData.class);
@@ -69,6 +71,7 @@ public class Data {
 	}
 	
 	static void saveModels() {
+		sortModels();
 		final ObjectMapper objectMapper = new ObjectMapper();
 		try {
 			objectMapper.writeValue(new File("models.json"), modelData);
@@ -76,6 +79,12 @@ public class Data {
 		catch (final IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	static void sortModels() {
+		modelData.models().sort(Comparator
+				.comparing(Data::modelName, String.CASE_INSENSITIVE_ORDER)
+					.thenComparing(Model::path));
 	}
 	
 	static void saveApps() {
@@ -86,6 +95,11 @@ public class Data {
 		catch (final IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private static String modelName(final Model model) {
+		final Path fileName = Path.of(model.path()).getFileName();
+		return fileName == null ? model.path() : fileName.toString();
 	}
 	
 	static List<String> scanModels() {
