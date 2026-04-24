@@ -1,6 +1,7 @@
 package de.extio.lm_launcher;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -9,7 +10,9 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.Box;
@@ -27,6 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
@@ -34,6 +38,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 public class LaunchFrame extends JFrame {
 	
@@ -57,7 +66,7 @@ public class LaunchFrame extends JFrame {
 	
 	JList list;
 	
-	JList list_1;
+	JTree modelTree;
 	
 	JButton btnDelete;
 	
@@ -76,8 +85,6 @@ public class LaunchFrame extends JFrame {
 	JButton btnRun_1;
 	
 	DefaultListModel<String> listModel;
-	
-	DefaultListModel<String> list1Model;
 	
 	Component horizontalStrut;
 	
@@ -134,49 +141,32 @@ public class LaunchFrame extends JFrame {
 			this.panel = new JPanel();
 			this.contentPane.add(this.panel, BorderLayout.SOUTH);
 			{
-				this.btnAdd = new JButton("Add");
-				this.btnAdd.addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						final SelectModelDialog smDialog = new SelectModelDialog(LaunchFrame.this, path -> {
-							final ModelPropertiesDialog mpDialog = new ModelPropertiesDialog(LaunchFrame.this, path, null, model -> {
-								Data.modelData.models().add(model);
-								try {
-									Data.saveModels();
-								}
-								finally {
-									LaunchFrame.this.refresh();
-								}
-							});
-							mpDialog.setLocationRelativeTo(LaunchFrame.this);
-							mpDialog.setVisible(true);
-						});
-						smDialog.setLocationRelativeTo(LaunchFrame.this);
-						smDialog.setVisible(true);
-					}
-				});
-				this.panel.add(this.btnAdd);
-			}
-			{
 				this.btnEdit = new JButton("Edit");
 				this.btnEdit.addActionListener(new ActionListener() {
 					
 					@Override
 					public void actionPerformed(final ActionEvent e) {
-						final int index = LaunchFrame.this.list_1.getSelectedIndex();
-						if (index == -1) {
+						final String selectedPath = LaunchFrame.this.getSelectedModelPath();
+						if (selectedPath == null) {
 							JOptionPane.showMessageDialog(LaunchFrame.this, "Error: Select a model first", "Error Message", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
-						final Model editModel = Data.modelData.models().get(index);
-						final ModelPropertiesDialog mpDialog = new ModelPropertiesDialog(LaunchFrame.this, editModel.path(), editModel, model -> {
-							Data.modelData.models().set(index, model);
+						final Model existingModel = Data.findModelByPath(selectedPath);
+						final Model editModel = existingModel != null ? existingModel : Data.defaultModel(selectedPath);
+						final ModelPropertiesDialog mpDialog = new ModelPropertiesDialog(LaunchFrame.this, selectedPath, editModel, model -> {
+							// Replace or add model params
+							final int idx = Data.modelData.models().indexOf(existingModel);
+							if (idx >= 0) {
+								Data.modelData.models().set(idx, model);
+							}
+							else {
+								Data.modelData.models().add(model);
+							}
 							try {
 								Data.saveModels();
 							}
 							finally {
-								LaunchFrame.this.refresh();
+								LaunchFrame.this.refreshModelSliders(model);
 							}
 						});
 						mpDialog.setLocationRelativeTo(LaunchFrame.this);
@@ -184,51 +174,6 @@ public class LaunchFrame extends JFrame {
 					}
 				});
 				this.panel.add(this.btnEdit);
-			}
-			{
-				this.btnDelete = new JButton("Delete");
-				this.btnDelete.addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						final int index = LaunchFrame.this.list_1.getSelectedIndex();
-						if (index == -1) {
-							JOptionPane.showMessageDialog(LaunchFrame.this, "Error: Select a model first", "Error Message", JOptionPane.ERROR_MESSAGE);
-							return;
-						}
-						Data.modelData.models().remove(index);
-						try {
-							Data.saveModels();
-						}
-						finally {
-							LaunchFrame.this.refresh();
-						}
-					}
-				});
-				this.panel.add(this.btnDelete);
-			}
-			{
-				this.btnClone = new JButton("Clone");
-				this.btnClone.addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						final int index = LaunchFrame.this.list_1.getSelectedIndex();
-						if (index == -1) {
-							JOptionPane.showMessageDialog(LaunchFrame.this, "Error: Select a model first", "Error Message", JOptionPane.ERROR_MESSAGE);
-							return;
-						}
-						final Model model = Data.modelData.models().get(index);
-						Data.modelData.models().add(index, new Model(model.path(), model.contextSize(), model.maxContextSize(), model.gpuLayers(), model.threads(), model.promptTemplate()));
-						try {
-							Data.saveModels();
-						}
-						finally {
-							LaunchFrame.this.refresh();
-						}
-					}
-				});
-				this.panel.add(this.btnClone);
 			}
 		}
 		{
@@ -289,32 +234,26 @@ public class LaunchFrame extends JFrame {
 					
 					this.scrollPane_1 = new JScrollPane();
 					this.splitPane_2.setLeftComponent(this.scrollPane_1);
-					this.list1Model = new DefaultListModel<>();
-					this.list_1 = new JList(this.list1Model);
-					this.list_1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-					this.list_1.getSelectionModel().addListSelectionListener(e -> {
-						if (!e.getValueIsAdjusting()) {
-							final DefaultListSelectionModel selectionModel = (DefaultListSelectionModel) e.getSource();
-							if (selectionModel.getMinSelectionIndex() > -1) {
-								final Model model = Data.modelData.models().get(selectionModel.getMinSelectionIndex());
-								
-								this.slider_context.setMaximum(model.maxContextSize());
-								this.slider_context.setMajorTickSpacing(model.maxContextSize() / 4);
-								this.slider_context.setMinorTickSpacing(model.maxContextSize() / 16);
-								this.slider_context.setValue(model.contextSize());
-								this.slider_context.setLabelTable(this.slider_context.createStandardLabels(model.maxContextSize() / 4));
-								this.slider_context.setSnapToTicks(true);
-								this.slider_context.repaint();
-								
-								this.slider_threads.setValue(model.threads());
-								
-								this.slider_gpu.setValue(model.gpuLayers());
-								
-								this.lblPromptTemplate_1.setText(model.promptTemplate());
-							}
+					
+					// Tree view for models
+					this.modelTree = new JTree(new DefaultMutableTreeNode("Models"));
+					this.modelTree.setRootVisible(false);
+					this.modelTree.setShowsRootHandles(true);
+					this.modelTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+					this.modelTree.setCellRenderer(new ModelTreeCellRenderer());
+					// Set smaller font for tree to account for UI scaling
+					this.modelTree.setFont(this.modelTree.getFont().deriveFont(10f));
+					this.modelTree.addTreeSelectionListener(e -> {
+						final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.modelTree.getLastSelectedPathComponent();
+						if (node != null && node.isLeaf() && node.getUserObject() instanceof Path) {
+							final Path p = (Path) node.getUserObject();
+							final Model saved = Data.findModelByPath(p.toString());
+							final Model model = saved != null ? saved : Data.defaultModel(p.toString());
+							this.refreshModelSliders(model);
 						}
 					});
-					this.scrollPane_1.setViewportView(this.list_1);
+					this.scrollPane_1.setViewportView(this.modelTree);
+					
 					{
 						this.panel_3 = new JPanel();
 						this.splitPane_2.setRightComponent(this.panel_3);
@@ -498,16 +437,18 @@ public class LaunchFrame extends JFrame {
 						final App app = Data.appData.apps().get(AppIndex);
 						
 						Model model = null;
-						final int modelIndex = LaunchFrame.this.list_1.getSelectedIndex();
-						if (modelIndex > -1) {
-							final Model template = Data.modelData.models().get(modelIndex);
+						final String selectedPath = LaunchFrame.this.getSelectedModelPath();
+						if (selectedPath != null) {
+							final Model saved = Data.findModelByPath(selectedPath);
+							final Model template = saved != null ? saved : Data.defaultModel(selectedPath);
 							model = new Model(
 									template.path(),
 									LaunchFrame.this.slider_context.getValue(),
 									template.maxContextSize(),
 									LaunchFrame.this.slider_gpu.getValue(),
 									LaunchFrame.this.slider_threads.getValue(),
-									template.promptTemplate());
+									template.promptTemplate(),
+									template.ctime());
 						}
 						
 						final List<AppArgument> argumentOverrides = new ArrayList<>();
@@ -550,26 +491,95 @@ public class LaunchFrame extends JFrame {
 		this.refresh();
 	}
 	
+	/** Returns the absolute path string of the currently selected model leaf node, or null. */
+	private String getSelectedModelPath() {
+		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.modelTree.getLastSelectedPathComponent();
+		if (node != null && node.isLeaf() && node.getUserObject() instanceof Path) {
+			return ((Path) node.getUserObject()).toString();
+		}
+		return null;
+	}
+	
+	private void refreshModelSliders(final Model model) {
+		this.slider_context.setMaximum(model.maxContextSize());
+		this.slider_context.setMajorTickSpacing(Math.max(1, model.maxContextSize() / 4));
+		this.slider_context.setMinorTickSpacing(Math.max(1, model.maxContextSize() / 16));
+		this.slider_context.setValue(model.contextSize());
+		this.slider_context.setLabelTable(this.slider_context.createStandardLabels(Math.max(1, model.maxContextSize() / 4)));
+		this.slider_context.setSnapToTicks(true);
+		this.slider_context.repaint();
+		
+		this.slider_threads.setValue(model.threads());
+		this.slider_gpu.setValue(model.gpuLayers());
+		this.lblPromptTemplate_1.setText(model.promptTemplate() != null && !model.promptTemplate().isEmpty() ? model.promptTemplate() : "-");
+	}
+	
 	private void refresh() {
-		Data.sortModels();
+		// Rebuild apps list
 		this.listModel.clear();
 		Data.appData.apps()
 				.stream()
 				.map(app -> app.path().getFileName() + " " + app.path().getParent() + " " + app.interpreter())
 				.forEach(this.listModel::addElement);
 		
-		this.list1Model.clear();
-		Data.modelData.models()
-				.stream()
-				.map(model -> Path.of(model.path()).getFileName() + "; ctx " + model.contextSize() + "/" + model.maxContextSize())
-				.forEach(this.list1Model::addElement);
-		
 		if (this.table.getCellEditor() != null) {
 			this.table.getCellEditor().stopCellEditing();
 		}
 		this.appArgumentsTableModel.setRowCount(0);
 		
+		// Rebuild model tree from filesystem
+		final String baseStr = Data.props.getProperty("models");
+		if (baseStr != null) {
+			final Path base = Path.of(baseStr).toAbsolutePath().normalize();
+			final DefaultMutableTreeNode root = new DefaultMutableTreeNode(base);
+			final Map<Path, DefaultMutableTreeNode> nodeMap = new HashMap<>();
+			nodeMap.put(base, root);
+			
+			for (final Path modelPath : Data.scanModelPaths()) {
+				final Path rel = base.relativize(modelPath);
+				DefaultMutableTreeNode current = root;
+				Path currentAbs = base;
+				for (int i = 0; i < rel.getNameCount(); i++) {
+					currentAbs = currentAbs.resolve(rel.getName(i));
+					if (!nodeMap.containsKey(currentAbs)) {
+						final DefaultMutableTreeNode node = new DefaultMutableTreeNode(currentAbs);
+						current.add(node);
+						nodeMap.put(currentAbs, node);
+					}
+					current = nodeMap.get(currentAbs);
+				}
+			}
+			
+			this.modelTree.setModel(new DefaultTreeModel(root));
+		}
+		
 		this.repaint();
+	}
+	
+	/** Tree cell renderer: shows only the last path component (file/folder name). */
+	static class ModelTreeCellRenderer extends DefaultTreeCellRenderer {
+		
+		@Override
+		public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel,
+				final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
+			super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+			if (value instanceof DefaultMutableTreeNode) {
+				final Object userObj = ((DefaultMutableTreeNode) value).getUserObject();
+				if (userObj instanceof Path) {
+					final Path p = (Path) userObj;
+					final Path filename = p.getFileName();
+					setText(filename != null ? filename.toString() : p.toString());
+					// Highlight models with saved params
+					if (leaf) {
+						final Model saved = Data.findModelByPath(p.toString());
+						if (saved != null) {
+							setForeground(sel ? Color.WHITE : new Color(0, 100, 0));
+						}
+					}
+				}
+			}
+			return this;
+		}
 	}
 	
 	static class AppArgumentsJCheckBoxRenderer extends JCheckBox implements TableCellRenderer {

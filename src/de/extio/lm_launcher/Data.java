@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -45,7 +47,7 @@ public class Data {
 		for (int i = 0; i < modelData.models().size(); i++) {
 			final Model model = modelData.models.get(i);
 			if (model.maxContextSize() < model.contextSize() || model.promptTemplate() == null) {
-				modelData.models.set(i, new Model(model.path(), model.contextSize(), model.contextSize(), model.gpuLayers(), model.threads(), Objects.requireNonNullElse(model.promptTemplate(), "")));
+				modelData.models.set(i, new Model(model.path(), model.contextSize(), model.contextSize(), model.gpuLayers(), model.threads(), Objects.requireNonNullElse(model.promptTemplate(), ""), model.ctime()));
 			}
 		}
 		sortModels();
@@ -83,8 +85,9 @@ public class Data {
 	
 	static void sortModels() {
 		modelData.models().sort(Comparator
-				.comparing(Data::modelName, String.CASE_INSENSITIVE_ORDER)
-					.thenComparing(Model::path));
+				.<Model, String>comparing(m -> Path.of(m.path()).getParent().toString())
+				.thenComparing(Model::ctime).reversed()
+				.thenComparing(Data::modelName, String.CASE_INSENSITIVE_ORDER));
 	}
 	
 	static void saveApps() {
@@ -103,22 +106,55 @@ public class Data {
 	}
 	
 	static List<String> scanModels() {
-		final List<String> result = new ArrayList<>();
+		return scanModelPaths().stream().map(p -> p.toString()).toList();
+	}
+	
+	static List<Path> scanModelPaths() {
+		final List<Path> result = new ArrayList<>();
 		try {
 			try (var paths = Files.walk(Path.of(props.getProperty("models")))) {
 				paths
 						.filter(Files::isRegularFile)
 						.filter(p -> p.getFileName().toString().endsWith(".gguf"))
 						.map(Path::toAbsolutePath)
-						.map(Path::toString)
-						.sorted()
+						.map(Path::normalize)
 						.forEach(result::add);
 			}
 		}
 		catch (final IOException e) {
 			e.printStackTrace();
 		}
+		// Sort by parent path (alphabetical), then by file ctime within the same directory
+		result.sort(Comparator
+				.<Path, String>comparing(p -> p.getParent().toString())
+				.thenComparing(p -> {
+					try {
+						return Files.readAttributes(p, BasicFileAttributes.class).creationTime();
+					}
+					catch (final IOException e) {
+						return FileTime.fromMillis(0);
+					}
+				}).reversed()
+				.thenComparing(Path::toString));
 		return result;
+	}
+	
+	static Model findModelByPath(final String path) {
+		return modelData.models().stream()
+				.filter(m -> m.path().equals(path))
+				.findFirst()
+				.orElse(null);
+	}
+	
+	static Model defaultModel(final String path) {
+		long ctime = 0;
+		try {
+			ctime = Files.readAttributes(Path.of(path), BasicFileAttributes.class).creationTime().toMillis();
+		}
+		catch (final IOException e) {
+			// Use 0 as fallback
+		}
+		return new Model(path, 16000, 128000, 99, 6, "", ctime);
 	}
 	
 	static record ModelData(List<Model> models) {

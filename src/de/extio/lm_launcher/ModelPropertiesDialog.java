@@ -117,13 +117,15 @@ public class ModelPropertiesDialog extends JDialog {
 					@Override
 					public void actionPerformed(final ActionEvent e) {
 						ModelPropertiesDialog.this.setVisible(false);
+						final Model modelToSave = editModel != null ? editModel : Data.defaultModel(modelPath);
 						modelConsumer.accept(
 								new Model(modelPath,
 										Integer.parseInt(ModelPropertiesDialog.this.textField_3.getText()),
 										Integer.parseInt(ModelPropertiesDialog.this.textField.getText()),
 										Integer.parseInt(ModelPropertiesDialog.this.textField_1.getText()),
 										Integer.parseInt(ModelPropertiesDialog.this.textField_2.getText()),
-										ModelPropertiesDialog.this.txtPrompttemplate.getText()));
+										ModelPropertiesDialog.this.txtPrompttemplate.getText(),
+										modelToSave.ctime()));
 						ModelPropertiesDialog.this.dispose();
 					}
 				});
