@@ -345,6 +345,7 @@ public class LaunchFrame extends JFrame {
 							}
 							
 							final App app = new App(executable, interpreter, new ArrayList<>(), new ArrayList<>());
+							Data.appData.apps().add(app);
 							
 							final AppPropertiesDialog appPropertiesDialog = new AppPropertiesDialog(LaunchFrame.this, app, () -> {
 								Data.saveApps();
