@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
@@ -42,18 +43,27 @@ public class ModelPropertiesDialog extends JDialog {
 	JTextField textField_3;
 	JLabel lblPromptTemplate;
 	JTextField txtPrompttemplate;
+	JLabel lblTemperature;
+	JTextField txtTemperature;
+	JLabel lblTopP;
+	JTextField txtTopP;
+	JLabel lblTopK;
+	JTextField txtTopK;
+	JLabel lblMinP;
+	JTextField txtMinP;
 	
 	/**
 	 * Create the dialog.
 	 */
 	public ModelPropertiesDialog(final Frame parent, final String modelPath, final Model editModel, final Consumer<Model> modelConsumer) {
 		super(parent);
+		final Model modelToEdit = editModel != null ? editModel : Data.defaultModel(modelPath);
 		this.setTitle("Model properties");
 		this.setModalityType(ModalityType.APPLICATION_MODAL);
 		this.setModal(true);
 		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		
-		this.setBounds(UIScaler.scale(100), UIScaler.scale(100), UIScaler.scale(678), UIScaler.scale(191));
+		this.setBounds(UIScaler.scale(100), UIScaler.scale(100), UIScaler.scale(678), UIScaler.scale(320));
 		this.getContentPane().setLayout(new BorderLayout());
 		this.contentPanel.setBorder(new EmptyBorder(UIScaler.scale(5), UIScaler.scale(5), UIScaler.scale(5), UIScaler.scale(5)));
 		this.getContentPane().add(this.contentPanel, BorderLayout.CENTER);
@@ -107,6 +117,46 @@ public class ModelPropertiesDialog extends JDialog {
 			this.textField_1.setColumns(10);
 		}
 		{
+			this.lblTemperature = new JLabel("Temperature");
+			this.contentPanel.add(this.lblTemperature);
+		}
+		{
+			this.txtTemperature = new JTextField();
+			this.txtTemperature.setText(Model.formatDecimal(Model.DEFAULT_TEMPERATURE));
+			this.contentPanel.add(this.txtTemperature);
+			this.txtTemperature.setColumns(10);
+		}
+		{
+			this.lblTopP = new JLabel("Top P");
+			this.contentPanel.add(this.lblTopP);
+		}
+		{
+			this.txtTopP = new JTextField();
+			this.txtTopP.setText(Model.formatDecimal(Model.DEFAULT_TOP_P));
+			this.contentPanel.add(this.txtTopP);
+			this.txtTopP.setColumns(10);
+		}
+		{
+			this.lblTopK = new JLabel("Top K");
+			this.contentPanel.add(this.lblTopK);
+		}
+		{
+			this.txtTopK = new JTextField();
+			this.txtTopK.setText(String.valueOf(Model.DEFAULT_TOP_K));
+			this.contentPanel.add(this.txtTopK);
+			this.txtTopK.setColumns(10);
+		}
+		{
+			this.lblMinP = new JLabel("Min P");
+			this.contentPanel.add(this.lblMinP);
+		}
+		{
+			this.txtMinP = new JTextField();
+			this.txtMinP.setText(Model.formatDecimal(Model.DEFAULT_MIN_P));
+			this.contentPanel.add(this.txtMinP);
+			this.txtMinP.setColumns(10);
+		}
+		{
 			final JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			this.getContentPane().add(buttonPane, BorderLayout.SOUTH);
@@ -116,17 +166,30 @@ public class ModelPropertiesDialog extends JDialog {
 					
 					@Override
 					public void actionPerformed(final ActionEvent e) {
-						ModelPropertiesDialog.this.setVisible(false);
-						final Model modelToSave = editModel != null ? editModel : Data.defaultModel(modelPath);
-						modelConsumer.accept(
-								new Model(modelPath,
-										Integer.parseInt(ModelPropertiesDialog.this.textField_3.getText()),
-										Integer.parseInt(ModelPropertiesDialog.this.textField.getText()),
-										Integer.parseInt(ModelPropertiesDialog.this.textField_1.getText()),
-										Integer.parseInt(ModelPropertiesDialog.this.textField_2.getText()),
-										ModelPropertiesDialog.this.txtPrompttemplate.getText(),
-										modelToSave.ctime()));
-						ModelPropertiesDialog.this.dispose();
+						try {
+							final int contextSize = ModelPropertiesDialog.clampInt(ModelPropertiesDialog.parseIntField(ModelPropertiesDialog.this.textField_3, "Context Length"), 1,
+									Integer.MAX_VALUE);
+							final int maxContextSize = ModelPropertiesDialog.clampInt(ModelPropertiesDialog.parseIntField(ModelPropertiesDialog.this.textField, "Max Context Length"), 1,
+									Integer.MAX_VALUE);
+							final int gpuLayers = Math.max(0, ModelPropertiesDialog.parseIntField(ModelPropertiesDialog.this.textField_1, "GPU Layers"));
+							final int threads = Math.max(0, ModelPropertiesDialog.parseIntField(ModelPropertiesDialog.this.textField_2, "Threads"));
+							final double temperature = ModelPropertiesDialog.clampDouble(ModelPropertiesDialog.parseDoubleField(ModelPropertiesDialog.this.txtTemperature, "Temperature"),
+									Model.MIN_TEMPERATURE, Model.MAX_TEMPERATURE);
+							final double topP = ModelPropertiesDialog.clampDouble(ModelPropertiesDialog.parseDoubleField(ModelPropertiesDialog.this.txtTopP, "Top P"), Model.MIN_TOP_P,
+									Model.MAX_TOP_P);
+							final int topK = ModelPropertiesDialog.clampInt(ModelPropertiesDialog.parseIntField(ModelPropertiesDialog.this.txtTopK, "Top K"), Model.MIN_TOP_K,
+									Model.MAX_TOP_K);
+							final double minP = ModelPropertiesDialog.clampDouble(ModelPropertiesDialog.parseDoubleField(ModelPropertiesDialog.this.txtMinP, "Min P"), Model.MIN_MIN_P,
+									Model.MAX_MIN_P);
+							ModelPropertiesDialog.this.setVisible(false);
+							modelConsumer.accept(
+									new Model(modelPath, contextSize, maxContextSize, gpuLayers, threads, temperature, topP, topK, minP, ModelPropertiesDialog.this.txtPrompttemplate.getText(),
+											modelToEdit.ctime()));
+							ModelPropertiesDialog.this.dispose();
+						}
+						catch (final NumberFormatException nfe) {
+							JOptionPane.showMessageDialog(ModelPropertiesDialog.this, nfe.getMessage(), "Invalid model property", JOptionPane.WARNING_MESSAGE);
+						}
 					}
 				});
 				okButton.setActionCommand("OK");
@@ -145,16 +208,44 @@ public class ModelPropertiesDialog extends JDialog {
 			contentPanel.add(this.txtPrompttemplate);
 			this.txtPrompttemplate.setColumns(10);
 		}
-		if (editModel != null) {
-			this.textField.setText(String.valueOf(editModel.maxContextSize()));
-			this.textField_1.setText(String.valueOf(editModel.gpuLayers()));
-			this.textField_2.setText(String.valueOf(editModel.threads()));
-			this.textField_3.setText(String.valueOf(editModel.contextSize()));
-			this.txtPrompttemplate.setText(editModel.promptTemplate());
-		}
+		this.textField.setText(String.valueOf(modelToEdit.maxContextSize()));
+		this.textField_1.setText(String.valueOf(modelToEdit.gpuLayers()));
+		this.textField_2.setText(String.valueOf(modelToEdit.threads()));
+		this.textField_3.setText(String.valueOf(modelToEdit.contextSize()));
+		this.txtTemperature.setText(modelToEdit.temperatureDisplay());
+		this.txtTopP.setText(modelToEdit.topPDisplay());
+		this.txtTopK.setText(modelToEdit.topKDisplay());
+		this.txtMinP.setText(modelToEdit.minPDisplay());
+		this.txtPrompttemplate.setText(modelToEdit.promptTemplate());
 		
 		// Apply font scaling to all components
 		UIScaler.scaleComponentFonts(this);
+	}
+	
+	private static int parseIntField(final JTextField field, final String fieldName) {
+		try {
+			return Integer.parseInt(field.getText().trim());
+		}
+		catch (final NumberFormatException nfe) {
+			throw new NumberFormatException(fieldName + " must be a whole number.");
+		}
+	}
+	
+	private static double parseDoubleField(final JTextField field, final String fieldName) {
+		try {
+			return Double.parseDouble(field.getText().trim());
+		}
+		catch (final NumberFormatException nfe) {
+			throw new NumberFormatException(fieldName + " must be a decimal number.");
+		}
+	}
+	
+	private static int clampInt(final int value, final int minValue, final int maxValue) {
+		return Math.max(minValue, Math.min(maxValue, value));
+	}
+	
+	private static double clampDouble(final double value, final double minValue, final double maxValue) {
+		return Math.max(minValue, Math.min(maxValue, value));
 	}
 	
 }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
@@ -47,6 +49,8 @@ import javax.swing.tree.TreeSelectionModel;
 public class LaunchFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
+	
+	private static final int DECIMAL_SLIDER_SCALE = 100;
 	
 	private final JPanel contentPane;
 	
@@ -124,6 +128,30 @@ public class LaunchFrame extends JFrame {
 	JLabel lblPromptTemplate;
 	
 	JLabel lblPromptTemplate_1;
+	
+	JLabel lblTemperature;
+	
+	JSlider slider_temperature;
+	
+	JLabel lblTemperatureValue;
+	
+	JLabel lblTopP;
+	
+	JSlider slider_topP;
+	
+	JLabel lblTopPValue;
+	
+	JLabel lblTopK;
+	
+	JSlider slider_topK;
+	
+	JLabel lblTopKValue;
+	
+	JLabel lblMinP;
+	
+	JSlider slider_minP;
+	
+	JLabel lblMinPValue;
 	
 	/**
 	 * Create the frame.
@@ -255,8 +283,12 @@ public class LaunchFrame extends JFrame {
 					this.scrollPane_1.setViewportView(this.modelTree);
 					
 					{
+						final JScrollPane modelSettingsScrollPane = new JScrollPane();
+						modelSettingsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+						modelSettingsScrollPane.getVerticalScrollBar().setUnitIncrement(UIScaler.scale(16));
+						this.splitPane_2.setRightComponent(modelSettingsScrollPane);
 						this.panel_3 = new JPanel();
-						this.splitPane_2.setRightComponent(this.panel_3);
+						modelSettingsScrollPane.setViewportView(this.panel_3);
 						this.panel_3.setLayout(new GridLayout(0, 1, 0, 0));
 						{
 							this.lblContextLength = new JLabel("Context Length");
@@ -306,12 +338,105 @@ public class LaunchFrame extends JFrame {
 						}
 						{
 							this.lblPromptTemplate = new JLabel("Prompt Template");
+							this.lblPromptTemplate.setHorizontalAlignment(SwingConstants.CENTER);
 							this.panel_3.add(this.lblPromptTemplate);
 						}
 						{
 							this.lblPromptTemplate_1 = new JLabel("-");
 							this.lblPromptTemplate_1.setHorizontalAlignment(SwingConstants.CENTER);
 							this.panel_3.add(this.lblPromptTemplate_1);
+						}
+						{
+							this.lblTemperature = new JLabel("Temperature");
+							this.lblTemperature.setHorizontalAlignment(SwingConstants.CENTER);
+							this.panel_3.add(this.lblTemperature);
+						}
+						{
+							this.slider_temperature = new JSlider();
+							this.slider_temperature.setMinimum((int) (Model.MIN_TEMPERATURE * DECIMAL_SLIDER_SCALE));
+							this.slider_temperature.setMaximum((int) (Model.MAX_TEMPERATURE * DECIMAL_SLIDER_SCALE));
+							this.slider_temperature.setValue(LaunchFrame.doubleToSlider(Model.DEFAULT_TEMPERATURE));
+							this.slider_temperature.setMajorTickSpacing(50);
+							this.slider_temperature.setMinorTickSpacing(5);
+							this.slider_temperature.setLabelTable(LaunchFrame.createDecimalLabelTable(new int[] { 0, 50, 100, 150, 200 }));
+							this.slider_temperature.setPaintLabels(true);
+							this.slider_temperature.setPaintTicks(true);
+							this.slider_temperature.addChangeListener(e -> LaunchFrame.this.updateSamplingValueLabels());
+							this.panel_3.add(this.slider_temperature);
+						}
+						{
+							this.lblTemperatureValue = new JLabel("-");
+							this.lblTemperatureValue.setHorizontalAlignment(SwingConstants.CENTER);
+							this.panel_3.add(this.lblTemperatureValue);
+						}
+						{
+							this.lblTopP = new JLabel("Top P");
+							this.lblTopP.setHorizontalAlignment(SwingConstants.CENTER);
+							this.panel_3.add(this.lblTopP);
+						}
+						{
+							this.slider_topP = new JSlider();
+							this.slider_topP.setMinimum((int) (Model.MIN_TOP_P * DECIMAL_SLIDER_SCALE));
+							this.slider_topP.setMaximum((int) (Model.MAX_TOP_P * DECIMAL_SLIDER_SCALE));
+							this.slider_topP.setValue(LaunchFrame.doubleToSlider(Model.DEFAULT_TOP_P));
+							this.slider_topP.setMajorTickSpacing(25);
+							this.slider_topP.setMinorTickSpacing(5);
+							this.slider_topP.setLabelTable(LaunchFrame.createDecimalLabelTable(new int[] { 0, 25, 50, 75, 100 }));
+							this.slider_topP.setPaintLabels(true);
+							this.slider_topP.setPaintTicks(true);
+							this.slider_topP.addChangeListener(e -> LaunchFrame.this.updateSamplingValueLabels());
+							this.panel_3.add(this.slider_topP);
+						}
+						{
+							this.lblTopPValue = new JLabel("-");
+							this.lblTopPValue.setHorizontalAlignment(SwingConstants.CENTER);
+							this.panel_3.add(this.lblTopPValue);
+						}
+						{
+							this.lblTopK = new JLabel("Top K");
+							this.lblTopK.setHorizontalAlignment(SwingConstants.CENTER);
+							this.panel_3.add(this.lblTopK);
+						}
+						{
+							this.slider_topK = new JSlider();
+							this.slider_topK.setMinimum(Model.MIN_TOP_K);
+							this.slider_topK.setMaximum(Model.MAX_TOP_K);
+							this.slider_topK.setValue(Model.DEFAULT_TOP_K);
+							this.slider_topK.setMajorTickSpacing(100);
+							this.slider_topK.setMinorTickSpacing(25);
+							this.slider_topK.setSnapToTicks(true);
+							this.slider_topK.setPaintLabels(true);
+							this.slider_topK.setPaintTicks(true);
+							this.slider_topK.addChangeListener(e -> LaunchFrame.this.updateSamplingValueLabels());
+							this.panel_3.add(this.slider_topK);
+						}
+						{
+							this.lblTopKValue = new JLabel("-");
+							this.lblTopKValue.setHorizontalAlignment(SwingConstants.CENTER);
+							this.panel_3.add(this.lblTopKValue);
+						}
+						{
+							this.lblMinP = new JLabel("Min P");
+							this.lblMinP.setHorizontalAlignment(SwingConstants.CENTER);
+							this.panel_3.add(this.lblMinP);
+						}
+						{
+							this.slider_minP = new JSlider();
+							this.slider_minP.setMinimum((int) (Model.MIN_MIN_P * DECIMAL_SLIDER_SCALE));
+							this.slider_minP.setMaximum((int) (Model.MAX_MIN_P * DECIMAL_SLIDER_SCALE));
+							this.slider_minP.setValue(LaunchFrame.doubleToSlider(Model.DEFAULT_MIN_P));
+							this.slider_minP.setMajorTickSpacing(25);
+							this.slider_minP.setMinorTickSpacing(5);
+							this.slider_minP.setLabelTable(LaunchFrame.createDecimalLabelTable(new int[] { 0, 25, 50, 75, 100 }));
+							this.slider_minP.setPaintLabels(true);
+							this.slider_minP.setPaintTicks(true);
+							this.slider_minP.addChangeListener(e -> LaunchFrame.this.updateSamplingValueLabels());
+							this.panel_3.add(this.slider_minP);
+						}
+						{
+							this.lblMinPValue = new JLabel("-");
+							this.lblMinPValue.setHorizontalAlignment(SwingConstants.CENTER);
+							this.panel_3.add(this.lblMinPValue);
 						}
 						{
 							this.verticalStrut = Box.createVerticalStrut(20);
@@ -448,6 +573,10 @@ public class LaunchFrame extends JFrame {
 									template.maxContextSize(),
 									LaunchFrame.this.slider_gpu.getValue(),
 									LaunchFrame.this.slider_threads.getValue(),
+									LaunchFrame.this.sliderValue(LaunchFrame.this.slider_temperature),
+									LaunchFrame.this.sliderValue(LaunchFrame.this.slider_topP),
+									LaunchFrame.this.slider_topK.getValue(),
+									LaunchFrame.this.sliderValue(LaunchFrame.this.slider_minP),
 									template.promptTemplate(),
 									template.ctime());
 						}
@@ -484,6 +613,7 @@ public class LaunchFrame extends JFrame {
 		UIScaler.scaleComponentFonts(this);
 		
 		UIScaler.centerOnPrimaryDisplay(this);
+		this.updateSamplingValueLabels();
 		this.repaint();
 		this.splitPane.setDividerLocation(0.33);
 		this.splitPane_1.setDividerLocation(0.66);
@@ -512,7 +642,35 @@ public class LaunchFrame extends JFrame {
 		
 		this.slider_threads.setValue(model.threads());
 		this.slider_gpu.setValue(model.gpuLayers());
+		this.slider_temperature.setValue(LaunchFrame.doubleToSlider(model.temperatureValue()));
+		this.slider_topP.setValue(LaunchFrame.doubleToSlider(model.topPValue()));
+		this.slider_topK.setValue(model.topKValue());
+		this.slider_minP.setValue(LaunchFrame.doubleToSlider(model.minPValue()));
 		this.lblPromptTemplate_1.setText(model.promptTemplate() != null && !model.promptTemplate().isEmpty() ? model.promptTemplate() : "-");
+		this.updateSamplingValueLabels();
+	}
+	
+	private void updateSamplingValueLabels() {
+		this.lblTemperatureValue.setText(Model.formatDecimal(this.sliderValue(this.slider_temperature)));
+		this.lblTopPValue.setText(Model.formatDecimal(this.sliderValue(this.slider_topP)));
+		this.lblTopKValue.setText(String.valueOf(this.slider_topK.getValue()));
+		this.lblMinPValue.setText(Model.formatDecimal(this.sliderValue(this.slider_minP)));
+	}
+	
+	private double sliderValue(final JSlider slider) {
+		return slider.getValue() / (double) DECIMAL_SLIDER_SCALE;
+	}
+	
+	private static int doubleToSlider(final double value) {
+		return (int) Math.round(value * DECIMAL_SLIDER_SCALE);
+	}
+	
+	private static Hashtable<Integer, JLabel> createDecimalLabelTable(final int[] values) {
+		final Hashtable<Integer, JLabel> labels = new Hashtable<>();
+		for (final int value : values) {
+			labels.put(value, new JLabel(Model.formatDecimal(value / (double) DECIMAL_SLIDER_SCALE)));
+		}
+		return labels;
 	}
 	
 	private void refresh() {

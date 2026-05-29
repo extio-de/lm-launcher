@@ -15,7 +15,11 @@ record App(Path path, Path interpreter, @Deprecated List<String> arguments, List
 			"MODEL", m -> m.path(),
 			"CONTEXT_SIZE", m -> String.valueOf(m.contextSize()),
 			"THREADS", m -> String.valueOf(m.threads()),
-			"GPU_LAYERS", m -> String.valueOf(m.gpuLayers()));
+			"GPU_LAYERS", m -> String.valueOf(m.gpuLayers()),
+			"TEMP", Model::temperatureDisplay,
+			"TOP_P", Model::topPDisplay,
+			"TOP_K", Model::topKDisplay,
+			"MIN_P", Model::minPDisplay);
 	
 	String argumentsToString(boolean showAll) {
 		return this.argumentsToStringByArgs(this.appArguments.stream(), showAll);

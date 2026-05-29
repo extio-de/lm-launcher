@@ -10,7 +10,6 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,8 +45,10 @@ public class Data {
 		// Migration
 		for (int i = 0; i < modelData.models().size(); i++) {
 			final Model model = modelData.models.get(i);
-			if (model.maxContextSize() < model.contextSize() || model.promptTemplate() == null) {
-				modelData.models.set(i, new Model(model.path(), model.contextSize(), model.contextSize(), model.gpuLayers(), model.threads(), Objects.requireNonNullElse(model.promptTemplate(), ""), model.ctime()));
+			if (model.maxContextSize() < model.contextSize() || model.promptTemplate() == null || model.temperature() == null || model.topP() == null || model.topK() == null
+					|| model.minP() == null) {
+				modelData.models.set(i, new Model(model.path(), model.contextSize(), model.maxContextSize(), model.gpuLayers(), model.threads(), model.temperature(), model.topP(), model.topK(),
+						model.minP(), model.promptTemplate(), model.ctime()));
 			}
 		}
 		sortModels();
@@ -154,7 +155,7 @@ public class Data {
 		catch (final IOException e) {
 			// Use 0 as fallback
 		}
-		return new Model(path, 16000, 128000, 99, 6, "", ctime);
+		return new Model(path, 16000, 128000, 99, 6, Model.DEFAULT_TEMPERATURE, Model.DEFAULT_TOP_P, Model.DEFAULT_TOP_K, Model.DEFAULT_MIN_P, "", ctime);
 	}
 	
 	static record ModelData(List<Model> models) {

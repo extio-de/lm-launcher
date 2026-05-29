@@ -1,20 +1,73 @@
 # lm-launcher
 
-**Program Name:** Machine Learning Model and Application Manager
+A small Swing GUI for managing local GGUF models and launching apps with model-dependent command-line placeholders.
 
-**Purpose:** The program is a graphical user interface (GUI) application that allows users to manage machine learning models and applications. It provides a user-friendly interface for adding, editing, deleting, and cloning models and applications, as well as running applications with selected models.
+## What it does
 
-**Key Features:**
+- scans a configured models directory for `.gguf` files
+- stores per-model settings in `models.json`
+- stores app launch definitions in `apps.json`
+- launches apps with placeholders resolved from the selected model
 
-1. **Model Management:** Users can add, edit, delete, and clone models, as well as view their properties.
-2. **Application Management:** Users can add, edit, delete, and clone applications, as well as view their properties and run them with a selected model.
-3. **Data Storage:** The program uses a data storage system that loads and manages data from two JSON files: "models.json" and "apps.json".
-4. **GUI Components:** The program uses various GUI components, such as buttons, labels, sliders, and tables, to provide a user-friendly interface.
-5. **Event Handling:** The program uses event listeners to handle user interactions, such as button clicks and table selections.
-6. **Data Refresh:** The program has a method called `refresh()` that updates the GUI components with the latest data from the data storage.
-7. **Model and Application Editing:** Users can edit the properties of models and applications using dedicated dialog windows.
-8. **Argument Management:** Users can add, edit, or remove rows in a table to manage application arguments, and the changes are reflected in the application's arguments.
+## Model settings
 
-**Overall:** The program provides a comprehensive GUI application for managing machine learning models and applications, making it easier for users to work with these components and run applications with selected models.
+Each model can store:
 
-*[requests=10, requestDuration=PT25.84142404S, inTokens=10623, outTokens=1240, tps=49.6]*
+- context length
+- max context length
+- threads
+- GPU layers
+- prompt template
+- temperature
+- top-p
+- top-k
+- min-p
+
+The main window also provides sliders for quickly adjusting launch-time values for:
+
+- context length
+- threads
+- GPU layers
+- temperature
+- top-p
+- top-k
+- min-p
+
+## App placeholders
+
+Use these tokens in app arguments:
+
+- `MODEL`
+- `CONTEXT_SIZE`
+- `THREADS`
+- `GPU_LAYERS`
+- `TEMP`
+- `TOP_P`
+- `TOP_K`
+- `MIN_P`
+
+Example:
+
+```text
+-m MODEL -c CONTEXT_SIZE -t THREADS -ngl GPU_LAYERS --temp TEMP --top-p TOP_P --top-k TOP_K --min-p MIN_P
+```
+
+## Files
+
+- `lm-launcher.properties` – launcher configuration
+- `models.json` – saved model settings
+- `apps.json` – saved app definitions
+- `run.sh` – starts the packaged launcher jar
+
+## Run
+
+```bash
+./run.sh
+```
+
+To build from source with the bundled Jackson jars:
+
+```bash
+javac -cp jackson-annotations-2.17.2.jar:jackson-core-2.17.2.jar:jackson-databind-2.17.2.jar -d /tmp/lm-launcher-build $(find src -name '*.java' | sort)
+java -cp /tmp/lm-launcher-build:jackson-annotations-2.17.2.jar:jackson-core-2.17.2.jar:jackson-databind-2.17.2.jar de.extio.lm_launcher.Main
+```
