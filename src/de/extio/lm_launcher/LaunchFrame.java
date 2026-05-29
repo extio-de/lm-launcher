@@ -301,7 +301,7 @@ public class LaunchFrame extends JFrame {
 							this.slider_context.setMaximum(131072);
 							this.slider_context.setMajorTickSpacing(65536);
 							this.slider_context.setMinorTickSpacing(8192);
-							this.slider_context.setSnapToTicks(true);
+							this.slider_context.setSnapToTicks(false);
 							this.slider_context.setPaintLabels(true);
 							this.slider_context.setPaintTicks(true);
 							this.panel_3.add(this.slider_context);
@@ -313,7 +313,7 @@ public class LaunchFrame extends JFrame {
 						}
 						{
 							this.slider_threads = new JSlider();
-							this.slider_threads.setSnapToTicks(true);
+							this.slider_threads.setSnapToTicks(false);
 							this.slider_threads.setValue(0);
 							this.slider_threads.setPaintLabels(true);
 							this.slider_threads.setPaintTicks(true);
@@ -404,7 +404,7 @@ public class LaunchFrame extends JFrame {
 							this.slider_topK.setValue(Model.DEFAULT_TOP_K);
 							this.slider_topK.setMajorTickSpacing(100);
 							this.slider_topK.setMinorTickSpacing(25);
-							this.slider_topK.setSnapToTicks(true);
+							this.slider_topK.setSnapToTicks(false);
 							this.slider_topK.setPaintLabels(true);
 							this.slider_topK.setPaintTicks(true);
 							this.slider_topK.addChangeListener(e -> LaunchFrame.this.updateSamplingValueLabels());
@@ -637,7 +637,7 @@ public class LaunchFrame extends JFrame {
 		this.slider_context.setMinorTickSpacing(Math.max(1, model.maxContextSize() / 16));
 		this.slider_context.setValue(model.contextSize());
 		this.slider_context.setLabelTable(this.slider_context.createStandardLabels(Math.max(1, model.maxContextSize() / 4)));
-		this.slider_context.setSnapToTicks(true);
+		this.slider_context.setSnapToTicks(false);
 		this.slider_context.repaint();
 		
 		this.slider_threads.setValue(model.threads());

@@ -23,7 +23,7 @@ record Model(String path, int contextSize, int maxContextSize, int gpuLayers, in
 	
 	static final int MIN_TOP_K = 0;
 	
-	static final int MAX_TOP_K = 500;
+	static final int MAX_TOP_K = 250;
 	
 	static final double MIN_MIN_P = 0d;
 	
