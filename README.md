@@ -52,6 +52,28 @@ Example:
 -m MODEL -c CONTEXT_SIZE -t THREADS -ngl GPU_LAYERS --temp TEMP --top-p TOP_P --top-k TOP_K --min-p MIN_P
 ```
 
+## Setup
+
+### lm-launcher.properties
+
+The launcher reads `lm-launcher.properties` on startup. It requires at least the following keys:
+
+| Key | Description | Example |
+|-----|-------------|---------|
+| `models` | Path to the directory containing GGUF model files (scanned on startup) | `/mnt/data/data/lm/models/gguf/` |
+| `console` | Command template to launch a terminal; `CMD` is replaced with the resolved app command | `/usr/bin/konsole --noclose -e CMD` |
+
+Example:
+
+```properties
+models=/mnt/data/data/lm/models/gguf/
+console=/usr/bin/konsole --noclose -e CMD
+```
+
+### Default configuration files
+
+The repository ships with default `lm-launcher.properties`, `models.json`, and `apps.json` files. These are meant as reference examples — copy them and adjust the paths and settings to match your environment. Apps and models can be managed in the GUI.
+
 ## Files
 
 - `lm-launcher.properties` – launcher configuration

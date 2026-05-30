@@ -1,1 +1,43 @@
-{"models":[{"path":"/mnt/data/data/lm/models/gguf/m/Qwen3.6-35B-A3B-UD-Q5_K_XL-mtp.gguf","contextSize":16000,"maxContextSize":128000,"gpuLayers":99,"threads":8,"temperature":0.8,"topP":0.95,"topK":40,"minP":0.05,"promptTemplate":"","ctime":1779609453785},{"path":"/home/sb/lm/models/Meta-Llama-3.1-8B-Instruct-Q8_0.gguf","contextSize":32768,"maxContextSize":32768,"gpuLayers":99,"threads":6,"temperature":0.8,"topP":0.95,"topK":40,"minP":0.05,"promptTemplate":"llama-3","ctime":0}]}
+{
+  "models": [
+    {
+      "path": "/mnt/data/data/lm/models/gguf/xl/MiniMax-M2.7-UD-IQ4_XS-00001-of-00004.gguf",
+      "contextSize": 70000,
+      "maxContextSize": 70000,
+      "gpuLayers": 16,
+      "threads": 8,
+      "temperature": 0.8,
+      "topP": 0.95,
+      "topK": 40,
+      "minP": 0.05,
+      "promptTemplate": "",
+      "ctime": 1780078731016
+    },
+    {
+      "path": "/mnt/data/data/lm/models/gguf/l/gemma-4-31B-it-UD-Q5_K_XL.gguf",
+      "contextSize": 16000,
+      "maxContextSize": 128000,
+      "gpuLayers": 99,
+      "threads": 6,
+      "temperature": 1.0,
+      "topP": 0.95,
+      "topK": 64,
+      "minP": 0.05,
+      "promptTemplate": "",
+      "ctime": 1779726285456
+    },
+    {
+      "path": "/mnt/data/data/lm/models/gguf/l/Qwen3.6-27B-UD-Q5_K_XL-mtp.gguf",
+      "contextSize": 110000,
+      "maxContextSize": 128000,
+      "gpuLayers": 99,
+      "threads": 8,
+      "temperature": 0.6,
+      "topP": 0.95,
+      "topK": 20,
+      "minP": 0.0,
+      "promptTemplate": "",
+      "ctime": 1779607347232
+    }
+  ]
+}

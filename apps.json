@@ -1,1 +1,663 @@
-{"apps":[{"path":"file:///home/sb/lm/koboldcpp-rocm/koboldcpp.py","interpreter":"file:///usr/bin/python","arguments":[],"appArguments":[{"argument":"--usecublas","optional":true,"default_":true},{"argument":"mmq","optional":true,"default_":false},{"argument":"lowvram","optional":true,"default_":false},{"argument":"0","optional":true,"default_":true},{"argument":"--gpulayers","optional":true,"default_":true},{"argument":"GPU_LAYERS","optional":true,"default_":true},{"argument":"--smartcontext","optional":true,"default_":false},{"argument":"--noshift","optional":true,"default_":false},{"argument":"--contextsize","optional":false,"default_":true},{"argument":"CONTEXT_SIZE","optional":false,"default_":true},{"argument":"--launch","optional":false,"default_":true},{"argument":"--host","optional":true,"default_":false},{"argument":"0.0.0.0","optional":true,"default_":false},{"argument":"--threads","optional":false,"default_":true},{"argument":"THREADS","optional":false,"default_":true},{"argument":"--model","optional":false,"default_":true},{"argument":"MODEL","optional":false,"default_":true}],"modelSettings":[]},{"path":"file:///home/sb/lm/llama.cpp/llama-server","interpreter":null,"arguments":[],"appArguments":[{"argument":"-nkvo","optional":true,"default_":false},{"argument":"--parallel","optional":true,"default_":false},{"argument":"2","optional":true,"default_":false},{"argument":"4","optional":true,"default_":false},{"argument":"--host","optional":true,"default_":true},{"argument":"0.0.0.0","optional":true,"default_":true},{"argument":"--port","optional":false,"default_":true},{"argument":"5001","optional":false,"default_":true},{"argument":"-t","optional":false,"default_":true},{"argument":"THREADS","optional":false,"default_":true},{"argument":"-ngl","optional":false,"default_":true},{"argument":"GPU_LAYERS","optional":false,"default_":true},{"argument":"--ctx-size","optional":false,"default_":true},{"argument":"CONTEXT_SIZE","optional":false,"default_":true},{"argument":"-m","optional":false,"default_":true},{"argument":"MODEL","optional":false,"default_":true}],"modelSettings":[{"modelPath":"/mnt/data/data/lm/models/gguf/m/Qwen3.6-35B-A3B-UD-Q5_K_XL-mtp.gguf","appArguments":[{"argument":"-nkvo","optional":true,"default_":false},{"argument":"--parallel","optional":true,"default_":true},{"argument":"2","optional":true,"default_":true},{"argument":"4","optional":true,"default_":false},{"argument":"--host","optional":true,"default_":true},{"argument":"0.0.0.0","optional":true,"default_":true},{"argument":"--port","optional":false,"default_":true},{"argument":"5001","optional":false,"default_":true},{"argument":"-t","optional":false,"default_":true},{"argument":"THREADS","optional":false,"default_":true},{"argument":"-ngl","optional":false,"default_":true},{"argument":"GPU_LAYERS","optional":false,"default_":true},{"argument":"--ctx-size","optional":false,"default_":true},{"argument":"CONTEXT_SIZE","optional":false,"default_":true},{"argument":"-m","optional":false,"default_":true},{"argument":"MODEL","optional":false,"default_":true}]}]},{"path":"file:///home/sb/lm/SillyTavern/start.sh","interpreter":null,"arguments":[],"appArguments":[],"modelSettings":[]},{"path":"file:///home/sb/lm/ollama-oai-bridge/start.sh","interpreter":null,"arguments":[],"appArguments":[],"modelSettings":[]}]}
+{
+  "apps": [
+    {
+      "path": "file:///home/sb/lm/llama.cpp/build/bin/llama-server",
+      "interpreter": null,
+      "arguments": [],
+      "appArguments": [
+        {
+          "argument": "-nkvo",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "--parallel",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "3",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "--reasoning",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "off",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "--spec-type",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "draft-mtp",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "--spec-draft-n-max",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "2",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "-ts",
+          "optional": true,
+          "default_": true
+        },
+        {
+          "argument": "3,2",
+          "optional": true,
+          "default_": true
+        },
+        {
+          "argument": "--no-mmap",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "--jinja",
+          "optional": true,
+          "default_": true
+        },
+        {
+          "argument": "--reasoning-budget",
+          "optional": true,
+          "default_": true
+        },
+        {
+          "argument": "5000",
+          "optional": true,
+          "default_": true
+        },
+        {
+          "argument": "--device",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "ROCm0",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "--split-mode",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "layer",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "row",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "tensor",
+          "optional": true,
+          "default_": false
+        },
+        {
+          "argument": "--host",
+          "optional": true,
+          "default_": true
+        },
+        {
+          "argument": "0.0.0.0",
+          "optional": true,
+          "default_": true
+        },
+        {
+          "argument": "--port",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "5001",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "-t",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "THREADS",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "-ngl",
+          "optional": true,
+          "default_": true
+        },
+        {
+          "argument": "GPU_LAYERS",
+          "optional": true,
+          "default_": true
+        },
+        {
+          "argument": "--ctx-size",
+          "optional": true,
+          "default_": true
+        },
+        {
+          "argument": "CONTEXT_SIZE",
+          "optional": true,
+          "default_": true
+        },
+        {
+          "argument": "-m",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "MODEL",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "--temp",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "TEMP",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "--top-p",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "TOP_P",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "--top-k",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "TOP_K",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "--min-p",
+          "optional": false,
+          "default_": true
+        },
+        {
+          "argument": "MIN_P",
+          "optional": false,
+          "default_": true
+        }
+      ],
+      "modelSettings": [
+        {
+          "modelPath": "/mnt/data/data/lm/models/gguf/xl/MiniMax-M2.7-UD-IQ4_XS-00001-of-00004.gguf",
+          "appArguments": [
+            {
+              "argument": "-nkvo",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--parallel",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "3",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--reasoning",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "off",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--spec-type",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "draft-mtp",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--spec-draft-n-max",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "2",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "-ts",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "3,2",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--no-mmap",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--jinja",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "--reasoning-budget",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "5000",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "--device",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "ROCm0",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--split-mode",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "layer",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "row",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "tensor",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "--host",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "0.0.0.0",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "--port",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "5001",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "-t",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "THREADS",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "-ngl",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "GPU_LAYERS",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "--ctx-size",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "CONTEXT_SIZE",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "-m",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "MODEL",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "--temp",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "TEMP",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "--top-p",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "TOP_P",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "--top-k",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "TOP_K",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "--min-p",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "MIN_P",
+              "optional": false,
+              "default_": true
+            }
+          ]
+        },
+        {
+          "modelPath": "/mnt/data/data/lm/models/gguf/m/Qwen3.6-35B-A3B-UD-Q5_K_XL-mtp.gguf",
+          "appArguments": [
+            {
+              "argument": "-nkvo",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--parallel",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "3",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--reasoning",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "off",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--spec-type",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "draft-mtp",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "--spec-draft-n-max",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "2",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "-ts",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "3,2",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "--no-mmap",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--jinja",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "--reasoning-budget",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "5000",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "--device",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "ROCm0",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--split-mode",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "layer",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "row",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "tensor",
+              "optional": true,
+              "default_": false
+            },
+            {
+              "argument": "--host",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "0.0.0.0",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "--port",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "5001",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "-t",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "THREADS",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "-ngl",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "GPU_LAYERS",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "--ctx-size",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "CONTEXT_SIZE",
+              "optional": true,
+              "default_": true
+            },
+            {
+              "argument": "-m",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "MODEL",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "--temp",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "TEMP",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "--top-p",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "TOP_P",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "--top-k",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "TOP_K",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "--min-p",
+              "optional": false,
+              "default_": true
+            },
+            {
+              "argument": "MIN_P",
+              "optional": false,
+              "default_": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "file:///home/sb/lm/SillyTavern/start.sh",
+      "interpreter": null,
+      "arguments": [],
+      "appArguments": [],
+      "modelSettings": [
+        {
+          "modelPath": "/mnt/data/data/lm/models/gguf/xl/MiniMax-M2.7-UD-IQ4_XS-00001-of-00004.gguf",
+          "appArguments": []
+        }
+      ]
+    },
+    {
+      "path": "file:///home/sb/lm/ollama-oai-bridge/start.sh",
+      "interpreter": null,
+      "arguments": [],
+      "appArguments": [
+        {
+          "argument": "-Dbridge.reported-context-offset=30000",
+          "optional": false,
+          "default_": true
+        }
+      ],
+      "modelSettings": []
+    }
+  ]
+}
