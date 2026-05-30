@@ -225,15 +225,7 @@ public class LaunchFrame extends JFrame {
 					this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 					this.list.getSelectionModel().addListSelectionListener(e -> {
 						if (!e.getValueIsAdjusting()) {
-							if (this.table.getCellEditor() != null) {
-								this.table.getCellEditor().stopCellEditing();
-							}
-							this.appArgumentsTableModel.setRowCount(0);
-							final DefaultListSelectionModel selectionModel = (DefaultListSelectionModel) e.getSource();
-							if (selectionModel.getMinSelectionIndex() > -1) {
-								final App app = Data.appData.apps().get(selectionModel.getMinSelectionIndex());
-								app.appArguments().forEach(arg -> this.appArgumentsTableModel.addRow(new Object[] { arg }));
-							}
+							LaunchFrame.this.refreshSelectedAppArguments();
 						}
 					});
 					this.scrollPane.setViewportView(this.list);
@@ -279,6 +271,7 @@ public class LaunchFrame extends JFrame {
 							final Model model = saved != null ? saved : Data.defaultModel(p.toString());
 							this.refreshModelSliders(model);
 						}
+						LaunchFrame.this.refreshSelectedAppArguments();
 					});
 					this.scrollPane_1.setViewportView(this.modelTree);
 					
@@ -469,7 +462,7 @@ public class LaunchFrame extends JFrame {
 								interpreter = fileChooser.getSelectedFile().toPath();
 							}
 							
-							final App app = new App(executable, interpreter, new ArrayList<>(), new ArrayList<>());
+							final App app = new App(executable, interpreter, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 							Data.appData.apps().add(app);
 							
 							final AppPropertiesDialog appPropertiesDialog = new AppPropertiesDialog(LaunchFrame.this, app, () -> {
@@ -537,7 +530,7 @@ public class LaunchFrame extends JFrame {
 						}
 						
 						final App app = Data.appData.apps().get(index);
-						Data.appData.apps().add(index, new App(app.path(), app.interpreter(), new ArrayList<>(app.arguments()), new ArrayList<>(app.appArguments())));
+						Data.appData.apps().add(index, new App(app.path(), app.interpreter(), new ArrayList<>(app.arguments()), new ArrayList<>(app.appArguments()), new ArrayList<>(app.modelSettings())));
 						
 						Data.saveApps();
 						LaunchFrame.this.refresh();
@@ -581,19 +574,19 @@ public class LaunchFrame extends JFrame {
 									template.ctime());
 						}
 						
-						final List<AppArgument> argumentOverrides = new ArrayList<>();
-						if (LaunchFrame.this.table.getCellEditor() != null) {
-							LaunchFrame.this.table.getCellEditor().stopCellEditing();
-						}
-						for (int i = 0; i < LaunchFrame.this.appArgumentsTableModel.getRowCount(); i++) {
-							final AppArgument appArgument = (AppArgument) LaunchFrame.this.appArgumentsTableModel.getValueAt(i, 0);
-							if (appArgument.optional()) {
-								argumentOverrides.add(appArgument);
-							}
-						}
+						final List<AppArgument> selectedArguments = LaunchFrame.this.currentTableArguments();
+						final List<AppArgument> argumentOverrides = selectedArguments.stream().filter(AppArgument::optional).toList();
 						
 						try {
 							app.run(model, argumentOverrides);
+							if (model != null) {
+								Data.upsertModel(model);
+								Data.saveModels();
+								app.saveArgumentsForModel(selectedPath, selectedArguments);
+								Data.saveApps();
+								LaunchFrame.this.refreshModelSliders(model);
+								LaunchFrame.this.refreshSelectedAppArguments();
+							}
 						}
 						catch (final IllegalArgumentException iae) {
 							JOptionPane.showMessageDialog(LaunchFrame.this, iae.getMessage(), "Error Message", JOptionPane.WARNING_MESSAGE);
@@ -629,6 +622,38 @@ public class LaunchFrame extends JFrame {
 			return ((Path) node.getUserObject()).toString();
 		}
 		return null;
+	}
+	
+	private App getSelectedApp() {
+		final int selectedIndex = this.list.getSelectedIndex();
+		if (selectedIndex < 0) {
+			return null;
+		}
+		return Data.appData.apps().get(selectedIndex);
+	}
+	
+	private void refreshSelectedAppArguments() {
+		if (this.table.getCellEditor() != null) {
+			this.table.getCellEditor().stopCellEditing();
+		}
+		this.appArgumentsTableModel.setRowCount(0);
+		final App selectedApp = this.getSelectedApp();
+		if (selectedApp == null) {
+			return;
+		}
+		selectedApp.argumentsForModel(this.getSelectedModelPath())
+				.forEach(argument -> this.appArgumentsTableModel.addRow(new Object[] { argument }));
+	}
+	
+	private List<AppArgument> currentTableArguments() {
+		if (this.table.getCellEditor() != null) {
+			this.table.getCellEditor().stopCellEditing();
+		}
+		final List<AppArgument> selectedArguments = new ArrayList<>(this.appArgumentsTableModel.getRowCount());
+		for (int i = 0; i < this.appArgumentsTableModel.getRowCount(); i++) {
+			selectedArguments.add((AppArgument) this.appArgumentsTableModel.getValueAt(i, 0));
+		}
+		return selectedArguments;
 	}
 	
 	private void refreshModelSliders(final Model model) {
@@ -712,6 +737,7 @@ public class LaunchFrame extends JFrame {
 			this.modelTree.setModel(new DefaultTreeModel(root));
 		}
 		
+		this.refreshSelectedAppArguments();
 		this.repaint();
 	}
 	

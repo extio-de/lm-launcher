@@ -65,10 +65,13 @@ public class Data {
 		// Migration
 		for (int i = 0; i < appData.apps.size(); i++) {
 			final App app = appData.apps.get(i);
-			if (app.appArguments() == null) {
+			if (app.appArguments().isEmpty() && !app.arguments().isEmpty()) {
 				final List<AppArgument> arguments = new ArrayList<>(app.arguments().size());
 				app.arguments().stream().map(argument -> new AppArgument(argument, false, true)).forEach(arguments::add);
-				appData.apps.set(i, new App(app.path(), app.interpreter(), new ArrayList<>(), arguments));
+				appData.apps.set(i, new App(app.path(), app.interpreter(), new ArrayList<>(), arguments, new ArrayList<>(app.modelSettings())));
+			}
+			else if (!app.arguments().isEmpty()) {
+				appData.apps.set(i, new App(app.path(), app.interpreter(), new ArrayList<>(), new ArrayList<>(app.appArguments()), new ArrayList<>(app.modelSettings())));
 			}
 		}
 	}
@@ -145,6 +148,16 @@ public class Data {
 				.filter(m -> m.path().equals(path))
 				.findFirst()
 				.orElse(null);
+	}
+	
+	static void upsertModel(final Model model) {
+		for (int i = 0; i < modelData.models().size(); i++) {
+			if (modelData.models().get(i).path().equals(model.path())) {
+				modelData.models().set(i, model);
+				return;
+			}
+		}
+		modelData.models().add(model);
 	}
 	
 	static Model defaultModel(final String path) {
